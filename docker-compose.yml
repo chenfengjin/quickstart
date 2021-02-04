@@ -1,0 +1,38 @@
+version: "3"
+
+networks:
+  extnetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+
+services:
+  xchain:
+    image: xuperchain:dev
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.2
+    ports:
+    - "37200:37200"
+
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.3
+    command: --web.enable-lifecycle --config.file=/data/prometheus.yml
+    volumes:
+      - ./data:/data
+    ports:
+    - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.4
+    ports:
+    - "3000:3000"
